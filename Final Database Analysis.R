@@ -10,6 +10,10 @@ spreadsheet_data = read.csv("C:/Users/marci/OneDrive/Documents/ASU/BIO 498/Weekl
 # Load ggplot2 library for creating plots
 library(ggplot2)
 
+# Install viridis package to use color palette for charts
+install.packages("viridisLite")
+library(viridisLite)
+
 # Create a table of the proportion of each species
 placental_data = spreadsheet_data$"Placental sampling"
 
@@ -68,8 +72,8 @@ plot_sample_types <- ggplot(placental_freq_df, aes(x = "", y = Frequency, fill =
   labs(fill = "Placental Samples Collected",
        title = "Proportion of Placental Sample Types Represented In Placenta Data Sets") +
   # Add percentages to the legend
-  scale_fill_manual(
-    values = scales::hue_pal()(nrow(placental_freq_df)), # Assign colors
+  scale_fill_viridis_d(
+    option = "plasma", # Assign colors
     labels = paste0(placental_freq_df$`Placental Samples Collected`, " (", placental_freq_df$Proportion, "%)") # Combine data type and proportion
   )
 
@@ -156,8 +160,8 @@ plot_complications <- ggplot(complications_freq_df, aes(x = "", y = Frequency, f
   labs(fill = "Pregnancy Complications",
        title = "Proportion of Pregnancy Complications Represented In Placenta Data Sets") +
   # Add percentages to the legend
-  scale_fill_manual(
-    values = scales::hue_pal()(nrow(complications_freq_df)), # Assign colors
+  scale_fill_viridis_d(
+    option = "magma", # Assign colors
     labels = paste0(complications_freq_df$`Pregnancy Complications in Data Set`, " (", complications_freq_df$Proportion, "%)") # Combine data type and proportion
   )
 
@@ -246,8 +250,8 @@ plot_other_tissues <- ggplot(other_tissues_freq_df, aes(x = "", y = Frequency, f
   labs(fill = "Other Tissue Types Collected",
        title = "Proportion of Other Tissue Types Represented In Placenta Data Sets") +
   # Add percentages to the legend
-  scale_fill_manual(
-    values = scales::hue_pal()(nrow(other_tissues_freq_df)), # Assign colors
+  scale_fill_viridis_d(
+    option = "inferno", # Assign colors
     labels = paste0(other_tissues_freq_df$`Other Tissue Types in Data Set`, " (", other_tissues_freq_df$Proportion, "%)") # Combine data type and proportion
   )
 
@@ -354,10 +358,15 @@ desired_order <- c(
 # Convert the "Trimester" column to a factor with the specified order
 trimester_df$Trimester <- factor(trimester_df$Trimester, levels = desired_order)
 
+# Calculate the proportions
+trimester_df$Proportion <- round(trimester_df$Frequency / sum(trimester_df$Frequency) * 100, 1)
+
 # Plot the frequency of pregnancy trimesters
 plot_trimester <- ggplot(data = trimester_df, aes(x = Trimester, y = Frequency, fill = Trimester)) +
   geom_bar(stat = "identity", color = "black") + # Add black border to bars
-  scale_fill_brewer(palette = "Set3") + # Use a color palette
+  scale_fill_viridis_d(option = "rocket") + # Use a color palette
+  geom_text(aes(label = paste0(Proportion, "%")), # Add percentages as labels
+            vjust = -0.5, size = 3) + # Adjust vertical position and size of text
   xlab("Pregnancy Stage") +
   ylab("Frequency") +
   ggtitle("Frequency of Pregnancy Stages in Placenta Data Sets") +
@@ -390,3 +399,4 @@ ggsave(paste0(output_direc, "plot_trimester.jpg"), plot = plot_trimester, width 
 
 # Print a message to confirm the plot has been saved
 cat("Plot saved in:", output_direc)
+
